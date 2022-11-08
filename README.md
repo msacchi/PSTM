@@ -3,8 +3,7 @@
 
 Testing forward and adjoint operators for PSTM. 
 
-The imagine is given by $m(z,x)$.  We consider the image equal to
-subsurface reflectivity. The data are given by $d(t,k)$ where $k$ is trace number. Receiver and source positions are $xs(k)$ and $xg(k)$. Both
+The subsurface image is given by $m(z,x)$.  We consider the image an estimator of the subsurface reflectivity. The data are given by $d(t,k)$ where $k$ is trace number. Receiver and source positions are $xs(k)$ and $xg(k)$. Both
 are deployed at $z=0$. 
 
 The code *main.jl* shows how to compute:
