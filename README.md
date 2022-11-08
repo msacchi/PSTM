@@ -18,3 +18,10 @@ $$J = \| L m - d\|_2^2 + \mu {\cal R}(m)$$
 
 
 
+*main.jl* runs and example
+
+*dot_product_test.jl* checks that $L$ and $L'$ pass the dot product test
+
+Results should look like:
+
+![image](Figure_1.png)

@@ -72,6 +72,8 @@ m[120:120+nw-1,51:end].=-w
 ma = ma/maximum(ma)
 m = m/maximum(m)
 d = d/maximum(d)
+
+
     figure(1)
     
     subplot(221); imshow(m,vmin=-0.3,vmax=0.3, cmap="seismic")

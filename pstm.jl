@@ -27,17 +27,19 @@ end
     to grab from data.
 
     v is assumed constant but could be replaced by vrms and place
-    output in t0 = migration time rather z as I did below.
+    the output in t0 = migration time rather z as I did below.
 
-    - model,  m, is reflectivity as a matrix m(1:Nz,1:Nx).
+    - model,  m, is the reflectivity as a matrix m(1:Nz,1:Nx).
 
     - data are in format d(time,trace_number) and source and receiver
-    positions are give as sx(trace_number) and gx(trace_number). So in both
+    positions are give as sx(trace_number) and gx(trace_number). So both
     input and output are matrices. time=1:Nt and trace_number=1:Ntraces.
     Ntrace = Ng*Ns (number of geophones x number of source), so I am assuming
-    a fixed array of geophones that all hear each moving source. A professional 
-    version should get source, reeiver positions from headers loop over total number
-    of traces which probaly is not Ng*NS..
+    a fixed array of geophones that all record each moving source. A professional 
+    version should get source and receiver positions from headers loop over total number
+    of traces which probaly is not Ng*NS.
+
+    - Still to do is also to divide ouput in offset bins.
 
 
     M D Sacchi 2022 after discussions with AQ and AA.
