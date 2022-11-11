@@ -26,8 +26,8 @@ end
     no interpolation is applied when converting traveltime to sample
     to grab from data.
 
-    v is assumed constant but could be replaced by vrms and place
-    the output in t0 = migration time rather z as I did below.
+    v is assumed constant but could be replaced by rms velocities and place
+    the output at t0 (migration time) rather that z as I did below.
 
     - model,  m, is the reflectivity as a matrix m(1:Nz,1:Nx).
 
@@ -65,7 +65,7 @@ function Operator_Kirk(In::Array{Float64,2}, P, Flag)
         sx = P.sx[k]
         gx = P.gx[k]
          for ix=1: P.Nx
-            for iz=1: P.Nz
+            for iz=4: P.Nz
                 d_s = sqrt((P.x[ix]-sx)^2+(P.z[iz])^2)
                 d_g = sqrt((P.x[ix]-gx)^2+(P.z[iz])^2)
                 t = (d_s+d_g)/c0
@@ -83,7 +83,7 @@ else
         sx = P.sx[k]
         gx = P.gx[k]
          for ix =1: P.Nx
-            for iz=1: P.Nz
+            for iz=4: P.Nz
                 d_s = sqrt((P.x[ix]-sx)^2+(P.z[iz])^2)
                 d_g = sqrt((P.x[ix]-gx)^2+(P.z[iz])^2)
                 t = (d_s+d_g)/c0
