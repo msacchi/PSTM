@@ -1,5 +1,5 @@
 # PSTM
-## Kirchhoff Migration (PSTM) 
+## Kirchhoff Migration (PSTM) tests 
 
 Testing forward and adjoint operators for PSTM. 
 
