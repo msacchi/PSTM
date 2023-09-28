@@ -1,6 +1,7 @@
 using PyPlot, SeisProcessing, SeisPlot
 
 include("pstm.jl")
+#--------------
 
     dx = 10.0    
     dz = 10.0
