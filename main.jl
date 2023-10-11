@@ -1,57 +1,38 @@
-using PyPlot, SeisProcessing, SeisPlot
+using PyPlot, SeisReconstruction, SeisProcessing, SeisPlot, FFTW
 
-include("pstm.jl")
-#--------------
+include("Operator_PSTM.jl")
+include("Operator_Conv.jl")
+include("geom.jl")
 
-    dx = 10.0    
-    dz = 10.0
-    dt = 0.004
-    Nx = 200
-    Nz = 240
-    Nt = 900
-    c0 = 1500.0
-    Ng = 100
-    Ns = 5
+wavelet = Ricker(); 
 
-    x = zeros(Float64, Nx)
-    z = zeros(Float64, Nz)
-
-    x = [(i-1)*dx for i=1:Nx]
-    z = [(i-1)*dz for i=1:Nz]
-  
-    ds = 1.0*(Nx-1)*dx/Ns
-    dg = 1.0*(Nx-1)*dx/Ng
-
-    sx = zeros(Float64,Ng*Ns)
-    gx = zeros(Float64,Ng*Ns)
-  
-    for is = 1: Ns
-        for ig = 1: Ng
-            j = (is-1)*Ng+ig
-            sx[j] = (is-1)*ds
-            gx[j] = (ig-1)*dg
-        end
-    end
-    
-    Ntraces = Ng*Ns
-        
-    P = Initialization_K(dx,dz,dt,Nx,Nz,Nt,gx,sx,Ntraces,x,z,c0)
-
-m = zeros(Float64,Nz,Nx)
-w = Ricker(dt=dz,f0=0.5/(2.0*dz)) # Wavelet in depth
-nw = length(w)
-
-# Simple earth model consisting of difractors and a vertical fault
-
-m[50:50+nw-1,1:50].=-w
-m[100:100+nw-1,51:end].=-w
-m[70:70+nw-1,1:50].=-w
-m[120:120+nw-1,51:end].=-w
-
-  d = Operator_Kirk(m, P, "foward")
- ma = Operator_Kirk(d, P, "adj")
-
- mi = zeros(Float64,Nz,Nx)
- mu = 0.00001
+ Nx = 100
+ Nz = 130
+ dt = 0.004
+ dx = 5.0
+ dz = 5.0
+ Nt = 400
 
 
+sx,gx = geom()
+
+Ntraces = length(sx) 
+Param_PSTM = Dict(:Ntraces=>Ntraces,:Nx=>Nx,:Nz=>Nz,:dt=>dt,
+         :dx=>dx,:dz=>dz,
+         :Nt=>Nt,:c0=>2000,:sx=>sx,:gx=>gx)
+
+
+m = zeros(Nz,Nx);
+m[40,40] =1;
+m[60,60] =-1;
+
+d  = Operator_Conv(Operator_PSTM(m,false; Param_PSTM...), false; Param_Conv...)
+
+Param_Conv = Dict(:wavelet=>wavelet)
+Operator = [Operator_Conv, Operator_PSTM]
+  Param  = [Param_Conv, Param_PSTM]
+
+dpred  = Operator_Conv(Operator_PSTM(x,false; Param_PSTM...), false; Param_Conv...)
+x,J = ConjugateGradients(d,Operator,Param; Niter=130,mu=0.01)
+subplot(221);SeisPlotTX(x/maximum(abs.(x)),vmin=-1,vmax=1;cmap="seismic",fignum=1)
+tight_layout()

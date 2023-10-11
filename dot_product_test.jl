@@ -1,60 +1,38 @@
-using PyPlot,SeisProcessing,SeisPlot,Printf
+using PyPlot, SeisReconstruction, SeisProcessing, SeisPlot, FFTW
 
-include("pstm.jl")
+include("Operator_PSTM.jl")
+include("Operator_Conv.jl")
+include("geom.jl")
 
-    dx=10.0
-    dz=10.0
-    dt=0.004
-    Nx=200
-    Nz=240
-    Nt=900
+wavelet = Ricker(); 
 
-    c0 = 1500.0
-
-    Ng = 100
-    ## PLAY with number of sources to see improvement in migration
-    Ns = 5
-
-    x = zeros(Float64, Nx)
-    z = zeros(Float64, Nz)
-
-    for ix = 1:Nx
-        x[ix]=(ix-1)*dx
-    end
-    for iz = 1:Nz
-        z[iz]=(iz-1)*dz
-    end
-    
-    ds = 1.0*(Nx-1)*dx/Ns
-    dg = 1.0*(Nx-1)*dx/Ng
-
-    sx = zeros(Float64,Ng*Ns)
-    gx = zeros(Float64,Ng*Ns)
-  
-    for is = 1: Ns
-        for ig = 1: Ng
-            j = (is-1)*Ng+ig
-            sx[j] = (is-1)*ds
-            gx[j] = (ig-1)*dg
-        end
-    end
-    
-    Ntraces = Ng*Ns
-        
+ Nx = 100
+ Nz = 130
+ dt = 0.004
+ dx = 5.0
+ dz = 5.0
+ Nt = 400
 
 
-    P = Initialization_K(dx,dz,dt,Nx,Nz,Nt,gx,sx,Ntraces,x,z,c0)
+sx,gx = geom()
+
+Ntraces = length(sx) 
+Param_PSTM = Dict(:Ntraces=>Ntraces,:Nx=>Nx,:Nz=>Nz,:dt=>dt,
+         :dx=>dx,:dz=>dz,
+         :Nt=>Nt,:c0=>2000,:sx=>sx,:gx=>gx)
 
 
+ m1  = randn(Nz,Nx)
+ d1 = Operator_Conv(Operator_PSTM(m1,false; Param_PSTM...), false; Param_Conv...)
 
-m1=randn(Nz,Nx)
-d1=Operator_Kirk(m1, P, "forward")
 
-d2=randn(Nt,Ntraces)
-m2=Operator_Kirk(d2, P, "adj")
+ d2  = randn(Nt,Ntraces)
+ m2 = Operator_PSTM(Operator_Conv(d2,true;  Param_Conv...), true;  Param_PSTM...)
 
- dot_m = sum(m1.*m2) 
- dot_d = sum(d1.*d2)
 
- @printf "dot_m: %f\n" dot_m
- @printf "dot_d: %f\n" dot_d
+ dot_d = sum(d1.*d2) 
+ dot_m = sum(m1.*m2)
+
+ r = abs(dot_d-dot_m)/(dot_d+dot_m)
+
+ println(" Passed the dot product test? :",   r< 1.0E-10)
