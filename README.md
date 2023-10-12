@@ -23,10 +23,10 @@ $$J = \| L m - d\|_2^2 + \mu \| m\|_2^2$$
 
 Results should look like:
 
-![image](Figure1.png)
+![image](figure1.png)
 
-![image](Figure2.png)
+![image](figure2.png)
 
-![image](Figure3.png)
+![image](figure3.png)
 
-![image](Figure4.png)
+![image](figure4.png)
