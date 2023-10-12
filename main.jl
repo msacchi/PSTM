@@ -1,38 +1,74 @@
 using PyPlot, SeisReconstruction, SeisProcessing, SeisPlot, FFTW
-
 include("Operator_PSTM.jl")
 include("Operator_Conv.jl")
 include("geom.jl")
 
-wavelet = Ricker(); 
+# Inverse problem crime. Forward demigration operator is used to generate data and
+# and then CGLS is used to solve the LSM (Least-squares migration) problem
 
- Nx = 100
- Nz = 130
+ wavelet = Ricker(dt=0.004, f0=15) 
+
+ Nx = 800
+ Nz = 530
  dt = 0.004
  dx = 5.0
  dz = 5.0
- Nt = 400
+ Nt = 600
+
+ sx,gx = geom()
+
+ Ntraces = length(sx) 
+
+ Param_PSTM = Dict(:Ntraces=>Ntraces,:Nx=>Nx,:Nz=>Nz,:dt=>dt,
+                   :dx=>dx,:dz=>dz,
+                   :Nt=>Nt,:c0=>3000,
+                   :sx=>sx,:gx=>gx)
+
+ Param_Conv = Dict(:wavelet=>wavelet)
 
 
-sx,gx = geom()
+ m = zeros(Nz,Nx);
+ m[140,140] =1;
+ m[160,260] =-1;
+ m[160,300] =-1;
+ m[160,560] =1;
 
-Ntraces = length(sx) 
-Param_PSTM = Dict(:Ntraces=>Ntraces,:Nx=>Nx,:Nz=>Nz,:dt=>dt,
-         :dx=>dx,:dz=>dz,
-         :Nt=>Nt,:c0=>2000,:sx=>sx,:gx=>gx)
+# Data
 
+ d  = Operator_Conv(Operator_PSTM(m,false; Param_PSTM...), false; Param_Conv...)
 
-m = zeros(Nz,Nx);
-m[40,40] =1;
-m[60,60] =-1;
+ # Migration 
+mig = Operator_PSTM(Operator_Conv(d,true; Param_Conv...), true; Param_PSTM...)
 
-d  = Operator_Conv(Operator_PSTM(m,false; Param_PSTM...), false; Param_Conv...)
+# Concatenate operators and its associated parameters
 
-Param_Conv = Dict(:wavelet=>wavelet)
-Operator = [Operator_Conv, Operator_PSTM]
-  Param  = [Param_Conv, Param_PSTM]
+ Operator = [Operator_Conv, Operator_PSTM]
+   Param  = [Param_Conv, Param_PSTM]
 
+   # LS Migration
+  
+x,J = ConjugateGradients(d,Operator,Param; Niter=20,mu=0.01)
 dpred  = Operator_Conv(Operator_PSTM(x,false; Param_PSTM...), false; Param_Conv...)
-x,J = ConjugateGradients(d,Operator,Param; Niter=130,mu=0.01)
-subplot(221);SeisPlotTX(x/maximum(abs.(x)),vmin=-1,vmax=1;cmap="seismic",fignum=1)
+
+SeisPlotTX(d/maximum(abs.(d)), vmin=-1, vmax=1, cmap="seismic", fignum=1, hbox=4, wbox=8, 
+                               dx=1, dy=dt, xlabel="Trace number", ylabel="t (s)", title="Data")
 tight_layout()
+savefig("figure1.png")
+
+SeisPlotTX(mig/maximum(abs.(mig)), vmin=-1, vmax=1, cmap="seismic", fignum=2, aspect="equal", hbox=4, wbox=8, 
+                               dx=dx, dy=dz, xlabel="x (m)", ylabel="z (m)", title="PSTM")
+tight_layout()
+savefig("figure2.png")
+
+
+SeisPlotTX(x/maximum(abs.(x)), vmin=-1, vmax=1, cmap="seismic", fignum=3, aspect="equal", hbox=4, wbox=8, 
+                               dx=dx, dy=dz, xlabel="x (m)", ylabel="z (m)", title="LS-PSTM")
+tight_layout()
+savefig("figure3.png")
+
+
+figure(4)
+plot(J);ylabel("Normalized Cost"); xlabel("Iteration")
+
+tight_layout()
+savefig("figure4.png")
