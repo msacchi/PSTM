@@ -7,14 +7,23 @@ The subsurface image is given by $m(z,x)$.  The image an estimator of the subsur
 
 The code *main.jl* shows how to use the two operators
 
-1) Demigration $d =W L m$  or  `d  = Operator_Conv(Operator_PSTM(m,false; Param_PSTM...), false; Param_Conv...)`
+1) Demigration $d =W L m$  
 
-2) Migration $m' = L'W' d$ or `mig = Operator_PSTM(Operator_Conv(d,true; Param_Conv...), true; Param_PSTM...)`
+  `d  = Operator_Conv(Operator_PSTM(m,false; Param_PSTM...), false; Param_Conv...)`
+
+2) Migration $m' = L'W' d$ 
+
+`mig = Operator_PSTM(Operator_Conv(d,true; Param_Conv...), true; Param_PSTM...)`
+
 3) How to use CGLS to solve the LS Migration problem for PSTM? In other words
 CGLS is used to minimize the cost function J. The latter requires to use implicit form 
 operators WL and L'W'
 
 $$J = \| WL m - d\|_2^2 + \mu \| m\|_2^2$$
+
+which is called as follows:
+
+`x,J = ConjugateGradients(d,[Operator_Conv, Operator_PSTM],[Param_Conv, Param_PSTM]; Niter=20,mu=0.01)`
 
 $L:$ is demigration and $W:$ is convolution with a wavelet which it is done in the frequency domain.
 
