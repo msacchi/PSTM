@@ -19,7 +19,7 @@ convolution equivalent to time domain cross-correlation:
 3) In Least-squares Migration (LSM) we estimate the reflectivity by solving
 the following problem
 
-$$m_{ls} = argmin\,{J}$$ with cost $$J = \| WL m - d\|_2^2 + \mu \| m\|_2^2$$
+$$m_{ls} = argmin {J}$$ with cost $$J = \| WL m - d\|_2^2 + \mu \| m\|_2^2$$
  The cost function is minimized using the Conjugate Gradient method which requires the  
 operators $WL$ and $L'W'$. In the code, this is given by 
 
@@ -46,4 +46,4 @@ And finally, the least-squares migration after $20$ CG iterations:
 I also show the cost $J$ vs iteration number. Clearly, the algorithm must converge because I am solving
 a linear problem by minimizing a quadratic cost. 
 
-![image](,/figs/figure4.png)
+![image](./figs/figure4.png)
