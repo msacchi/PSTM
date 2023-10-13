@@ -7,8 +7,9 @@ The subsurface image is given by $m(z,x)$.  The image an estimator of the subsur
 
 The code *main.jl* shows how to use the two operators
 
-1) Demigration $d =W L m$
-2) Migration $m' = L'W' d$ 
+1) Demigration $d =W L m$  or  'd  = Operator_Conv(Operator_PSTM(m,false; Param_PSTM...), false; Param_Conv...)
+
+2) Migration $m' = L'W' d$ or 'mig = Operator_PSTM(Operator_Conv(d,true; Param_Conv...), true; Param_PSTM...)'
 3) How to use CGLS to solve the LS Migration problem for PSTM? In other words
 CGLS is used to minimize the cost function J. The latter requires to use implicit form 
 operators WL and L'W'
@@ -35,5 +36,5 @@ And finally, the least-sqaures migration after $20$ CGLS iterations.
 
 To QC the problem, I also computed the cost $J$ vs. iteration number. Clearly, must converge because I am solving
 a linear problem.
- 
+
 ![image](figure4.png)
