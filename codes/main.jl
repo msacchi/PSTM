@@ -29,8 +29,8 @@ include("geom.jl")
 
  m = zeros(Nz,Nx);
  m[140,140] =1;
- m[160,260] =-1;
- m[160,300] =-1;
+ m[200,260:end] .=-1;
+ m[160,40:600] .=-1;
  m[160,560] =1;
 
 # Data
@@ -43,7 +43,7 @@ mig = Operator_PSTM(Operator_Conv(d,true; Param_Conv...), true; Param_PSTM...)
 
    # LS Migration.. see how I pass the operators 
   
-x,J = ConjugateGradients(d,[Operator_Conv, Operator_PSTM],[Param_Conv, Param_PSTM]; Niter=20,mu=0.01)
+x,J = ConjugateGradients(d,[Operator_Conv, Operator_PSTM],[Param_Conv, Param_PSTM]; Niter=40,mu=0.01)
 
 
 dpred  = Operator_Conv(Operator_PSTM(x,false; Param_PSTM...), false; Param_Conv...)
