@@ -40,14 +40,12 @@ include("geom.jl")
  # Migration 
 mig = Operator_PSTM(Operator_Conv(d,true; Param_Conv...), true; Param_PSTM...)
 
-# Concatenate operators and its associated parameters
 
- Operator = [Operator_Conv, Operator_PSTM]
-   Param  = [Param_Conv, Param_PSTM]
-
-   # LS Migration
+   # LS Migration.. see how I pass the operators 
   
-x,J = ConjugateGradients(d,Operator,Param; Niter=20,mu=0.01)
+x,J = ConjugateGradients(d,[Operator_Conv, Operator_PSTM],[Param_Conv, Param_PSTM]; Niter=20,mu=0.01)
+
+
 dpred  = Operator_Conv(Operator_PSTM(x,false; Param_PSTM...), false; Param_Conv...)
 
 SeisPlotTX(d/maximum(abs.(d)), vmin=-1, vmax=1, cmap="seismic", fignum=1, hbox=4, wbox=8, 
