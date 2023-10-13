@@ -7,26 +7,33 @@ The subsurface image is given by $m(z,x)$.  The image an estimator of the subsur
 
 The code *main.jl* shows how to use the two operators
 
-1) Demigration $d = L m$
-2) Migration $m' = L' d$ 
-3) How to use CGLS to solve the LS Migration problem for PSTM. In other words
+1) Demigration $d =W L m$
+2) Migration $m' = L'W' d$ 
+3) How to use CGLS to solve the LS Migration problem for PSTM? In other words
 CGLS is used to minimize the cost function J. The latter requires to use implicit form 
-operators L and 'L
+operators WL and L'W'
 
-$$J = \| L m - d\|_2^2 + \mu \| m\|_2^2$$
+$$J = \| WL m - d\|_2^2 + \mu \| m\|_2^2$$
 
-
+$L:$ is demigration and $W:$ is convolution with a wavelet which it is done in the frequency domain.
 
 *main.jl* runs an example where I use the "invere problem crime" to model data and then retrieve the model via CGLS
 
 *dot_product_test.jl* checks that $L$ and $L'$ pass the dot product test
 
-Results should look like:
+Results should look like. First, we show the data which is computed via the demigration operator $L$ 
 
 ![image](figure1.png)
 
+Now, I show the migrated image 
+
 ![image](figure2.png)
+
+And finally, the least-sqaures migration after $20$ CGLS iterations.
 
 ![image](figure3.png)
 
+To QC the problem, I also computed the cost $J$ vs. iteration number. Clearly, must converge because I am solving
+a linear problem.
+ 
 ![image](figure4.png)
